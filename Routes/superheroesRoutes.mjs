@@ -10,7 +10,7 @@ const validacionDeNombreSuperheroe = [   // VALIDACION DE NOMBRE DE SUPERHEROE
         .trim()
         .notEmpty().withMessage('El nombre es obligatorio')
         .isLength({ min: 3 }).withMessage('El nombre debe tener 3 caracteres como mínimo')
-        .isLength({ min: 60 }).withMessage('El nombre debe tener 60 caracteres como máximo')
+        .isLength({ max: 60 }).withMessage('El nombre debe tener 60 caracteres como máximo')
 ];
 
 
@@ -20,7 +20,7 @@ const validacionDeNombreReal = [   // VALIDACION DE NOMBRE REAL
         .trim()
         .notEmpty().withMessage('El nombre es obligatorio')
         .isLength({ min: 3 }).withMessage('El nombre debe tener 3 caracteres como mínimo')
-        .isLength({ min: 60 }).withMessage('El nombre debe tener 60 caracteres como máximo')
+        .isLength({ max: 60 }).withMessage('El nombre debe tener 60 caracteres como máximo')
 ];
 
 
@@ -31,7 +31,20 @@ const validacionDeEdad = [  // VALIDACION DE EDAD
         .notEmpty().withMessage('La edad es obligatoria')
         .isNumeric().withMessage('Solo caractere numéricos')
         .isInt({ min: 0 }).withMessage('La edad debe ser un número positivo')
-]
+];
+
+
+
+const validacionDePoderes = [   // VALIDACION DE PODERES
+    body('poderes')
+        .isArray({ min: 1 }).withMessage('Debe haber al menos un poder'),
+
+    body('poderes.*')
+        .trim()
+        .notEmpty().withMessage('Los poderes no pueden estar vacios')
+        .isLength({ min: 3 }).withMessage('Cada poder debe tener al menos 3 caracteres')
+        .isLength({ max: 60 }).withMessage('Cada poder debe tener menos de 60 caracteres')
+];
 
 
 
@@ -41,7 +54,7 @@ const middlewareErrores = (req, res, next) => {   // MIDDLEWARE
         return res.status(400).json({ error: errores.array() });
     }
     next();
-}
+};
 
 
 
@@ -54,20 +67,21 @@ router.get('/superheroes', obtenerTodosLosSuperheroesController);
 
 router.post(
     '/superheroes',
-    crearSuperheroeController,
     validacionDeNombreSuperheroe,
     validacionDeNombreReal,
     validacionDeEdad,
-    middlewareErrores
+    validacionDePoderes,
+    middlewareErrores,
+    crearSuperheroeController
 );
 
 
 
 router.put(
     '/superheroes/:id/edadactualizada',
-    actualizarSuperheroeController,
     validacionDeEdad,
-    middlewareErrores
+    middlewareErrores,
+    actualizarSuperheroeController
 );
 
 
